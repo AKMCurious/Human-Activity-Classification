@@ -4,7 +4,7 @@ README
 DataSet:
 ========
 
-Train dataset: https://www.kaggle.com/uciml/human-activity-recognition-with-smartphones/downloads/train.csv/1
+Train dataset: https://www.kaggle.com/uciml/human-activity-recognition-with-smartphones/downloads/train.csv/1 \
 Test dataset: https://www.kaggle.com/uciml/human-activity-recognition-with-smartphones/downloads/test.csv/1
 
 Scala classes:
