@@ -4,26 +4,30 @@ import org.apache.spark.sql.SparkSession
 
 object LRModelTest {
   def main(args: Array[String]): Unit = {
+    //Creating spark session
     val spark = SparkSession.builder()
       .appName("Activity Pred")
       .getOrCreate()
 
     import spark.implicits._
 
+    //Creating spark context
     val sparkContext = spark.sparkContext
     sparkContext.setLogLevel("ERROR")
 
+    //Reading the test dataset
     val testSet = spark.read.option("inferSchema", "true").option("header", "true")
       .csv(args(0) + "/test.csv")
 
+    //Loading the saved LR model
     val cvModel = CrossValidatorModel.load(args(0) + "/savedModel/LR")
 
+    //Transforming the best model on the test dataset
     val bestModel = cvModel.bestModel
-
     val testResult = bestModel.transform(testSet)
 
+    //Building output metrics 
     var buffer = new StringBuilder()
-
     val predictionAndLabels = testResult.select("label", "prediction")
       .map(x => (x.getDouble(0): Double, x.getDouble(1): Double)).rdd
     val metrics = new MulticlassMetrics(predictionAndLabels)
@@ -57,6 +61,7 @@ object LRModelTest {
     buffer.append(s"\nWeighted F1 score: ${metrics.weightedFMeasure}")
     buffer.append(s"\nWeighted false positive rate: ${metrics.weightedFalsePositiveRate}")
 
+    //saving output metrics in a file
     sparkContext.parallelize(Seq(Seq(buffer.toString()))).saveAsTextFile(args(0) + "/output/metrics")
   }
 }
